@@ -1,47 +1,50 @@
 version: '3'
 
 services:
+  # Service pour le serveur Zabbix
   zabbix-server:
     image: zabbix/zabbix-server-mysql:latest
     ports:
-      - 80:80
-      - 10051:10051
+      - 80:80  # Port d'interface web
+      - 10051:10051  # Port de communication avec les agents
     environment:
-      - DB_SERVER_HOST=mysql-server
-      - MYSQL_USER=zabbix
-      - MYSQL_PASSWORD=azerty
-      - MYSQL_DATABASE=zabbix
+      - DB_SERVER_HOST=mysql-server  # Nom d'hôte du serveur MySQL
+      - MYSQL_USER=zabbix  # Nom d'utilisateur MySQL pour Zabbix
+      - MYSQL_PASSWORD=my_password  # Mot de passe MySQL pour Zabbix
+      - MYSQL_DATABASE=zabbix  # Nom de la base de données pour Zabbix
     depends_on:
-      - mysql-server
+      - mysql-server  # Dépendance du conteneur MySQL
     networks:
       - zabbix-network
 
+  # Service pour l'interface web de Zabbix
   zabbix-web:
     image: zabbix/zabbix-web-nginx-mysql:latest
     ports:
-      - 8080:8080
+      - 8080:8080  # Port d'interface web
     environment:
-      - DB_SERVER_HOST=mysql-server
-      - MYSQL_USER=zabbix
-      - MYSQL_PASSWORD=azerty
-      - MYSQL_DATABASE=zabbix
-      - ZBX_SERVER_HOST=zabbix-server
+      - DB_SERVER_HOST=mysql-server  # Nom d'hôte du serveur MySQL
+      - MYSQL_USER=zabbix  # Nom d'utilisateur MySQL pour Zabbix
+      - MYSQL_PASSWORD=my_password  # Mot de passe MySQL pour Zabbix
+      - MYSQL_DATABASE=zabbix  # Nom de la base de données pour Zabbix
+      - ZBX_SERVER_HOST=zabbix-server  # Nom d'hôte du serveur Zabbix
     networks:
       - zabbix-network
 
+  # Service pour le serveur MySQL
   mysql-server:
     image: mysql:latest
     ports:
-      - 3306:3306
+      - 3306:3306  # Port de la base de données MySQL
     environment:
-      - MYSQL_DATABASE=zabbix
-      - MYSQL_USER=zabbix
-      - MYSQL_PASSWORD=azerty
-      - MYSQL_ROOT_PASSWORD=azerty
+      - MYSQL_DATABASE=zabbix  # Nom de la base de données MySQL pour Zabbix
+      - MYSQL_USER=zabbix  # Nom d'utilisateur MySQL pour Zabbix
+      - MYSQL_PASSWORD=my_password  # Mot de passe MySQL pour Zabbix
+      - MYSQL_ROOT_PASSWORD=my_password  # Mot de passe root MySQL
     volumes:
-      - ./mysql/data:/var/lib/mysql
+      - ./mysql/data:/var/lib/mysql  # Volume pour stocker les données MySQL
     networks:
       - zabbix-network
 
 networks:
-  zabbix-network:
+  zabbix-network:  # Réseau pour connecter les services
